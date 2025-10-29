@@ -27,8 +27,12 @@ If you use this code, please cite the following [manuscript](https://doi.org/10.
 2. `conda install -c conda-forge mamba` (optional, but recommended, if you do not already have `mamba` installed)
 3. `git clone git@github.com:microsoft/protein-uq.git`
 4. `cd protein-uq`
-5. `mamba env create -f environment.yml` or `conda env create -f environment.yml` (`mamba` is recommended for faster installation)
-6. `conda activate protein-uq`
+
+5. `pip3 install torch torchvision`   For RTX 5090   and modify /home/neurotoolbox/anaconda3/envs/protein-uq/lib/python3.9/site-packages/esm/pretrained.py
+to   model_data = torch.load(str(model_location), map_location="cpu", weights_only=False)  Because Starting with PyTorch 2.6, `torch.load` defaults to `weights_only=True`. This prevents non-tensor objects (such as `argparse.Namespace`) from being loaded safely.
+
+6. `mamba env create -f environment.yml` or `conda env create -f environment.yml` (`mamba` is recommended for faster installation)
+7. `conda activate protein-uq`
 
 ### Prepare Data in protein-uq repo
 1. `cd data`
