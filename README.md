@@ -42,15 +42,28 @@ to   model_data = torch.load(str(model_location), map_location="cpu", weights_on
 We used the [FLIP](https://github.com/J-SNACKKB/FLIP) repository to generate ESM embeddings for our models. The following commands can be used to reproduce the embeddings used in this work:
 
 0. `cd ..` (to leave the `protein-uq` directory)
-1. `git clone --recurse-submodules git@github.com:J-SNACKKB/FLIP.git` (`--recurse-submodules` is required to clone the ESM submodule of the FLIP repo)
+1. `git clone --recurse-submodules git@github.com:J-SNACKKB/FLIP.git` (`--recurse-submodules` is required to clone the ESM submodule of the FLIP repo)  Another way in HTTP, git clone --recurse-submodules https://github.com/J-SNACKKB/FLIP.git
+```
+cd FLIP
+git submodule set-url baselines/esm https://github.com/facebookresearch/esm.git
+git submodule sync
+git submodule update --init --recursive
+```
 2. `cd splits`
 3. `for d in {aav,gb1,meltome}; do (cd $d; unzip splits.zip); done`
 4. `cd ../baselines`
 5. `wget https://dl.fbaipublicfiles.com/fair-esm/models/esm1b_t33_650M_UR50S.pt` (this file is 7.3 GB)
 6. `wget https://dl.fbaipublicfiles.com/fair-esm/regression/esm1b_t33_650M_UR50S-contact-regression.pt`
-6. `flip_esm_embedding_commands.sh` - This script contains the commands used to generate the ESM embeddings with train-val-test splits for the 8 tasks used in this work. These commands should be run from the `baselines/` directory of the FLIP repository, and the `protein-uq` conda env must be activated. Each command will take a while.
+6. `flip_esm_embedding_commands.sh` - This script contains the commands used to generate the ESM embeddings with train-val-test splits for the 8 tasks used in this work. These commands should be run from the `baselines/` directory of the FLIP repository, and the `protein-uq` conda env must be activated. Each command will take a while. Path: /protein-uq/FLIP/baselines$ bash "/home/neurotoolbox/Py_Code/protein-uq/flip_esm_embedding_commands.sh"
 
 The embeddings will be saved in the `FLIP/baselines/embeddings/` directory. Pre-computed embeddings for the AAV landscape can also be downloaded from [Zenodo](https://doi.org/10.5281/zenodo.6549368).
+
+--truncate has been removed in the new version of ESM. So, in embeddings/embeddings.py    
+```
+parser.add_argument('--truncation_seq_length', type=int, default=1022)    
+parser.add_argument('--truncate', action='store_true', help='Legacy truncate flag (unused in new ESM versions)')
+```
+And, all instances of '--truncate' with --truncation_seq_length 1022
 
 ### Training and Evaluating Models with Uncertainty Quantification
 A list of commands to perform all training and inference for our models in series is provided in `src/models/train_all_commands_series.sh`. The following is an example command:
